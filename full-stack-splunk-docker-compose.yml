@@ -1,0 +1,310 @@
+
+
+
+
+
+version: "3.7"
+
+networks:
+    splunk:
+        driver: bridge
+        name: splunk-dhcp-server
+        ipam:
+            driver: default
+
+            config:
+                - subnet: 172.16.238.0/24
+
+services:
+
+  splunk7.3-indexer1:
+    # build: .
+    hostname: splunk7.3-indexer1
+    # image: austin-splunk7.3-base
+    image: store/splunk/splunk:7.3.0
+    container_name: splunk7.3-indexer1
+    privileged: true
+    cap_add:
+        - ALL
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: P@ssw0rd
+      SPLUNK_ENABLE_LISTEN: 9997
+      SPLUNK_ADD: tcp 1514
+      SPLUNK_USER: splunk
+    ports:
+      - "38880:8000"
+      - "38881:9997"
+      - "38882:8089"
+      - "38883:1514/tcp"
+      - "38884:22"
+      - "38885:8065"
+      - "38886:8191"
+      - "38887:9887"
+    restart: always  
+    volumes:
+      - ./config-files-needed-for-splunk-indexer1:/austin:rw
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 130s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    tmpfs:
+        - /run
+        - /tmp
+    logging:
+        driver: "json-file"
+        options:
+            max-size: "200k"
+            max-file: "10"
+        #Below is working
+        # driver: "syslog"
+        # options:
+        #     syslog-address: "tcp://192.168.86.34:12345"
+    networks: 
+        splunk:
+            aliases:
+                - splunk7.3-indexer1
+            ipv4_address: 172.16.238.2
+    dns:
+        - 8.8.8.8
+        - 9.9.9.9
+    expose:
+      - 38880
+      - 38881
+      - 38882
+      - 38883
+      - 38884
+      - 38885
+      - 38886
+      - 38887
+
+
+# splunk7.3-indexer2:
+#     # build: .
+#     hostname: splunk7.3-indexer2
+#     # image: austin-splunk7.3-base
+#     image: store/splunk/splunk:7.3.0
+#     container_name: splunk7.3-indexer2
+#     privileged: true
+#     cap_add:
+#         - ALL
+#     environment:
+#       SPLUNK_START_ARGS: --accept-license
+#       SPLUNK_PASSWORD: P@ssw0rd
+#       SPLUNK_ENABLE_LISTEN: 9997
+#       SPLUNK_ADD: tcp 1514
+#       SPLUNK_USER: splunk
+#     ports:
+#       - "38892:8000"
+#       - "38893:9997"
+#       - "38894:8089"
+#       - "38895:1514/tcp"
+#       - "38896:22"
+#       - "38897:8065"
+#       - "38898:8191"
+#       - "38899:9887"
+#     restart: always  
+#     volumes:
+#       - ./config-files-needed-for-splunk-indexer2:/austin:rw
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:8000"]
+#       interval: 130s
+#       timeout: 10s
+#       retries: 3
+#       start_period: 40s
+#     tmpfs:
+#         - /run
+#         - /tmp
+#     logging:
+#         driver: "json-file"
+#         options:
+#             max-size: "200k"
+#             max-file: "10"
+#         #Below is working
+#         # driver: "syslog"
+#         # options:
+#         #     syslog-address: "tcp://192.168.86.34:12345"
+#     networks: 
+#         splunk:
+#             aliases:
+#                 - splunk7.3-indexer2
+#             ipv4_address: 172.16.238.5
+#     dns:
+#         - 8.8.8.8
+#         - 9.9.9.9
+#     expose:
+#       - 38892
+#       - 38893
+#       - 38894
+#       - 38895
+#       - 38896
+#       - 38897
+#       - 38898
+#       - 38899
+
+
+#   splunk7.3-heavy-forwarder1:
+#     # build: .
+#     hostname: splunk7.3-heavy-forwarder1
+#     # image: austin-splunk7.3-base
+#     image: store/splunk/splunk:7.3.0
+#     container_name: splunk7.3-heavy-forwarder1
+#     privileged: true
+#     depends_on:
+#         - splunk7.3-indexer1
+#     cap_add:
+#         - ALL
+#     environment:
+#       SPLUNK_START_ARGS: --accept-license
+#       SPLUNK_PASSWORD: P@ssw0rd
+#       SPLUNK_ENABLE_LISTEN: 9997
+#       SPLUNK_ADD: tcp 1514
+#       SPLUNK_USER: splunk
+#     ports:
+#       - "38900:8000"
+#       - "38901:9997"
+#       - "38902:8089"
+#       - "38903:1514/tcp"
+#       - "38904:22"
+#       - "38905:8065"
+#       - "38906:8191"
+#       - "38907:9887"
+#     restart: always  
+#     volumes:
+#       - ./config-files-needed-for-splunk-heavy-forwarder1:/austin:rw
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:8000"]
+#       interval: 130s
+#       timeout: 10s
+#       retries: 3
+#       start_period: 40s
+#     tmpfs:
+#         - /run
+#         - /tmp
+#     logging:
+#         driver: "json-file"
+#         options:
+#             max-size: "200k"
+#             max-file: "10"
+#         #Below is working
+#         # driver: "syslog"
+#         # options:
+#         #     syslog-address: "tcp://192.168.86.34:12345"
+#     networks: 
+#         splunk:
+#             aliases:
+#                 - splunk7.3-heavy-forwarder1
+#             ipv4_address: 172.16.238.6
+#     dns:
+#         - 8.8.8.8
+#         - 9.9.9.9
+#     expose:
+#       - 38900
+#       - 38901
+#       - 38902
+#       - 38903
+#       - 38904
+#       - 38905
+#       - 38906
+#       - 38907
+
+
+
+#   splunk7.3-forwarder1:
+#     # build: .
+#     hostname: splunk7.3-forwarder1
+#     # image: austin-splunk7.3-base
+#     image: store/splunk/universalforwarder:7.3.0
+#     container_name: splunk7.3-forwarder1
+#     privileged: true
+#     cap_add:
+#         - ALL
+#     environment:
+#       SPLUNK_START_ARGS: --accept-license
+#       SPLUNK_PASSWORD: P@ssw0rd
+#     ports:
+#       - "38888:9997"
+#       - "38889:22"
+#     restart: always  
+#     volumes:
+#       - ./config-files-needed-for-splunk-forwarder1:/austin:rw
+#     depends_on:
+#       - splunk7.3-indexer1
+#     tmpfs:
+#         - /run
+#         - /tmp
+#     logging:
+#         driver: "json-file"
+#         options:
+#             max-size: "200k"
+#             max-file: "10"
+#         #Below is working
+#         # driver: "syslog"
+#         # options:
+#         #     syslog-address: "tcp://192.168.86.34:12345"
+#     networks: 
+#         splunk:
+#             aliases:
+#                 - splunk7.3-forwarder1
+#             ipv4_address: 172.16.238.3
+#     dns:
+#         - 8.8.8.8
+#         - 9.9.9.9
+#     expose:
+#       - 38888
+#       - 38889
+
+
+#   splunk7.3-forwarder2:
+#     # build: .
+#     hostname: splunk7.3-forwarder2
+#     # image: austin-splunk7.3-base
+#     image: store/splunk/universalforwarder:7.3.0
+#     container_name: splunk7.3-forwarder2
+#     privileged: true
+#     cap_add:
+#         - ALL
+#     environment:
+#       SPLUNK_START_ARGS: --accept-license
+#       SPLUNK_PASSWORD: P@ssw0rd
+#     ports:
+#       - "38890:9997"
+#       - "38891:22"
+#     restart: always  
+#     volumes:
+#       - ./config-files-needed-for-splunk-forwarder2:/austin:rw
+#     depends_on:
+#     # Add in any dependency
+#       - splunk7.3-indexer1
+#     tmpfs:
+#         - /run
+#         - /tmp
+#     logging:
+#         driver: "json-file"
+#         options:
+#             max-size: "200k"
+#             max-file: "10"
+#         #Below is working
+#         # driver: "syslog"
+#         # options:
+#         #     syslog-address: "tcp://192.168.86.34:12345"
+#     networks: 
+#         splunk:
+#             aliases:
+#                 - splunk7.3-forwarder2
+#             ipv4_address: 172.16.238.4
+#     dns:
+#         - 8.8.8.8
+#         - 9.9.9.9
+#     expose:
+#       - 38890
+#       - 38891
+
+
+
+
+
+
+

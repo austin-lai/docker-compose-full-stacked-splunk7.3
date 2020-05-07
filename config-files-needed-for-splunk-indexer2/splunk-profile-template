@@ -1,0 +1,46 @@
+#History Control
+HISTCONTROL=ignorespace
+
+#Set SPLUNK_HOME
+for SPLUNK_HOME in "/Applications/Splunk" "/Applications/SplunkForwarder" "/opt/splunk" "/opt/splunkforwarder" "/Applications/SplunkBeta" "/Applications/SplunkForwarderBeta
+" "${HOME}/splunkforwarder";do
+        if [ -d ${SPLUNK_HOME} ]; then
+                break
+        fi
+done
+if [ "${SPLUNK_HOME}" == "" ];then
+        echo "WARNING: SPLUNK_HOME env variable undefined"
+fi
+
+export SPLUNK_HOME
+
+#Add splunk to PATH
+export PATH=$PATH:/usr/bin:$SPLUNK_HOME/bin
+
+#Add btool to PATH
+KERNEL=`uname -s`
+case "x$KERNEL" in
+        "xLinux")
+                if [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
+                        export DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
+                else
+                        export DISTRO=$(ls -d /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -v "lsb" | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1)
+                fi
+                if [ "x$DISTRO" != "xUbuntu" ];then
+                        export LD_LIBRARY_PATH=$SPLUNK_HOME/lib
+                fi
+                ;;
+        "xDarwin")
+                export DYLD_LIBRARY_PATH=$SPLUNK_HOME/lib
+                ;;
+        *)
+                echo "ERROR: Unable to set LIBRARY_PATH"
+                exit 1
+                ;;
+esac
+
+
+#Prompt String 1 (PS1)
+PS1="[\`date\`] [\u@\h \w]\n> "
+
+#EOF
