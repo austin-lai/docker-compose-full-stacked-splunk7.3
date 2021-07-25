@@ -1,27 +1,36 @@
+<!-- 
+
+Started 25032020
+Updated 06032020
+Updated 25072021
+
+-->
+
 # docker-compose-full-stacked-splunk7.3
- 
-# Started 25032020
-
-
-========================================================================================================
-+++Updated 06032020
 
 Spin up splunk with docker-compose
---- you can validate your docker-compose with "docker-compose config"
---- docker-compose -f full-stack-splunk-docker-compose.yml up -d
---- docker logs -f splunk7.3-indexer
---- docker logs -f splunk7.3-forwarder
+
+<br />
+
+- You can validate your docker-compose with "docker-compose config"
+  - ` docker-compose config -f full-stack-splunk-docker-compose.yml `
+
+- To start the full stack
+  - ` docker-compose -f full-stack-splunk-docker-compose.yml up -d `
+
+- To check logs of container
+  - ` docker logs -f splunk7.3-indexer `
+  - ` docker logs -f splunk7.3-forwarder `
+
+- After splunk docker run
+  - ` docker exec -u root splunk7.3-indexer bash -c 'cd /austin; ./init-splunk-indexer.sh' `
+  - ` docker exec -u root splunk7.3-indexer bash -c 'service ssh start' `
+  - ` docker exec -u root splunk7.3-forwarder bash -c 'cd /austin; ./init-splunk-forwarder.sh' `
+  - ` docker exec -u root splunk7.3-forwarder bash -c 'service ssh start' `
 
 
-After splunk docker run
---- docker exec -u root splunk7.3-indexer bash -c 'cd /austin; ./init-splunk-indexer.sh'
---- docker exec -u root splunk7.3-indexer bash -c 'service ssh start'
---- docker exec -u root splunk7.3-forwarder bash -c 'cd /austin; ./init-splunk-forwarder.sh'
---- docker exec -u root splunk7.3-forwarder bash -c 'service ssh start'
-
-
-Destroy or stop or remove docker
---- docker-compose -f full-stack-splunk-docker-compose.yml down -v --remove-orphans
+- If you want to Destroy or stop or remove docker
+  - ` docker-compose -f full-stack-splunk-docker-compose.yml down -v --remove-orphans `
 
 
 
