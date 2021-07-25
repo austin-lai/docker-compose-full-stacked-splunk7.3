@@ -1,7 +1,4 @@
-
-
-
-
+# Update on 25072021
 
 version: "3.7"
 
@@ -11,16 +8,15 @@ networks:
         name: splunk-dhcp-server
         ipam:
             driver: default
-
             config:
                 - subnet: 172.16.238.0/24
 
 services:
 
   splunk7.3-indexer1:
+    # Add your build file or command here if you plan to use your own build
     # build: .
     hostname: splunk7.3-indexer1
-    # image: austin-splunk7.3-base
     image: store/splunk/splunk:7.3.0
     container_name: splunk7.3-indexer1
     privileged: true
@@ -58,7 +54,7 @@ services:
         options:
             max-size: "200k"
             max-file: "10"
-        #Below is working
+        #Below is working - syslog output to syslog server, change your syslog server ip here
         # driver: "syslog"
         # options:
         #     syslog-address: "tcp://192.168.86.34:12345"

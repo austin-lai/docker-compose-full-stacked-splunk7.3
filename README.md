@@ -8,11 +8,30 @@ Updated 25072021
 
 # docker-compose-full-stacked-splunk7.3
 
+Note: This docker-compose, information build on the year 2020 and it's built for isolated lab environment, hence some command or information might not up-to-date, howver, you may take it as a reference
+
 Spin up splunk with docker-compose
 
 <br />
 
-## You can validate your docker-compose with "docker-compose config"
+## Sample docker compose file included as below information or components
+
+- ` full-stack-splunk-docker-compose.yml ` --- using docker-compose version 3.7
+
+- It contained
+    - A network using ` bridge ` with the name ` splunk-dhcp-server `
+        - subnet under 172.16.238.0/24
+    - A service with
+        - ` splunk7.3-indexer1 ` - Enable by default
+        - ` splunk7.3-indexer2 ` - Disable by default
+        - ` splunk7.3-heavy-forwarder1 ` - Disable by default
+        - ` splunk7.3-heavy-forwarder2 ` - Disable by default
+        - ` splunk7.3-forwarder1 ` - Disable by default
+        - ` splunk7.3-forwarder2 ` - Disable by default
+
+<br />
+
+## You can validate docker-compose with "docker-compose config"
 
 - ` docker-compose config -f full-stack-splunk-docker-compose.yml `
 
@@ -21,22 +40,30 @@ Spin up splunk with docker-compose
 ## To start the full stack
 
 - ` docker-compose -f full-stack-splunk-docker-compose.yml up -d `
+- Remember to enable other components in ` full-stack-splunk-docker-compose.yml `
 
 <br />
 
-## To check logs of container
+## Sample command - to check logs of container
 
 - ` docker logs -f splunk7.3-indexer `
 - ` docker logs -f splunk7.3-forwarder `
 
 <br />
 
-## After splunk docker run
+## After splunk docker run, execute below command for each components --- sample command shown below
 
-- ` docker exec -u root splunk7.3-indexer bash -c 'cd /austin; ./init-splunk-indexer.sh' `
-- ` docker exec -u root splunk7.3-indexer bash -c 'service ssh start' `
-- ` docker exec -u root splunk7.3-forwarder bash -c 'cd /austin; ./init-splunk-forwarder.sh' `
-- ` docker exec -u root splunk7.3-forwarder bash -c 'service ssh start' `
+- Indexer --- to enable ssh and all the configuration needed, you can refer to the folder  "config-file-needed-for-splunk-indexer1" > " init-splunk-indexer.sh "
+    - ` docker exec -u root splunk7.3-indexer1 bash -c 'cd /austin; ./init-splunk-indexer1.sh' `
+    - ` docker exec -u root splunk7.3-indexer bash -c 'service ssh start' `
+
+- Heavy Forwarder --- to enable ssh and all the configuration needed, you can refer to the folder  "config-file-needed-for-splunk-heavy-forwarder1" > " init-splunk-heavy-forwarder1.sh "
+- ` docker exec -u root splunk7.3-heavy-forwarder1 bash -c 'cd /austin; ./init-splunk-heavy-forwarder1.sh' `
+- ` docker exec -u root splunk7.3-heavy-forwarder1 bash -c 'service ssh start' `
+
+- Universal Forwarder --- to enable ssh and all the configuration needed, you can refer to the folder  "config-file-needed-for-splunk-forwarder1" > " init-splunk-forwarder1.sh "
+- ` docker exec -u root splunk7.3-forwarder1 bash -c 'cd /austin; ./init-splunk-forwarder1.sh' `
+- ` docker exec -u root splunk7.3-forwarder1 bash -c 'service ssh start' `
 
 <br />
 
@@ -70,7 +97,13 @@ sudo /opt/splunk/bin/splunk restart
 docker run --rm -it -P -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=P@ssw0rd" --hostname splunk7.3 --name splunk7.3 store/splunk/splunk:7.3.0 create-defaults > default.yml
 ```
 
-Make a init script -- init.sh
+<br />
+
+## Create own init script -- init.sh
+
+You can create your own init script and replace it in each component folder
+
+```bash
 #!/bin/bash
 sudo echo 'root:root' | sudo chpasswd
 sudo apt update
@@ -78,50 +111,36 @@ sudo apt-get install -y openssh-server
 sudo sed -i '/#PermitRootLogin prohibit-password/a PermitRootLogin yes' /etc/ssh/sshd_config
 sudo service ssh start
 --- And with whatever you want to do
+```
 
+<br />
 
-Make a Dockerfile
---FROM splunk images as base "AS" new-images-name
---Label maintainer="Austin.Lai"
---COPY the scipt to install ssh and change sshd config and change root password && whatever thing you want to do
---RUN the script
+## Make a Dockerfile - if you plan to build your own version
 
+```dockerfile
+FROM splunk images as base "AS" new-images-name
+Label maintainer="Austin.Lai"
+COPY ```the scipt to install ssh and change sshd config and change root password && whatever thing you want to do```
+RUN the script
+```
 
+<br />
 
-Make a docker-compose.yml
+## Pull official splunk docker
 
-
-Spin up splunk with docker-compose
---- you can validate your docker-compose with "docker-compose config"
---- docker-compose up -d
---- docker logs -f images-name
-
-After splunk docker run
---- docker exec -it splunk7.3 bash
---- docker exec -it -u root splunk7.3-indexer /bin/bash
---- docker exec -u root splunk7.3-indexer bash -c 'cd /austin; ./init.sh'
---- docker exec splunk7.3-indexer bash -c 'sudo service ssh start'
-
-
-Destroy or stop or remove docker
---- docker rm -vf splunk7.3
---- docker-compose down
-
-
-sudo /opt/splunk/bin/splunk cmd btool props list | grep csv
-sudo /opt/splunk/bin/splunk cmd btool props list --debug | grep csv
-
-splunk btool check
-
-
-
-sudo docker run --rm -dit -P -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=P@ssw0rd" --hostname splunk7.3 --name splunk7.3 store/splunk/splunk:7.3.0
-
-
+```
 docker pull store/splunk/splunk:7.3.0
+```
 
+<br />
 
+## Splunk command - btool
+
+```bash
 sudo /opt/splunk/bin/splunk cmd btool props list | grep csv
+
 sudo /opt/splunk/bin/splunk cmd btool props list --debug | grep csv
 
 splunk btool check
+```
+

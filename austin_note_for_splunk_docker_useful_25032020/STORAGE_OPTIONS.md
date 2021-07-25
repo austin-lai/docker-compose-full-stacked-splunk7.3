@@ -1,24 +1,43 @@
-## Data Storage ##
-This section will cover examples of different options for configuring data persistence. This includes both indexed data and 
-configuration items. Splunk only supports data persistence to volumes mounted outside of the container. Data persistence for 
-folders inside of the container is not supported. The following are intended as only as examples and unofficial guidelines. 
+# Splunk - Data Storage - Docker
 
-### Storing indexes and search artifacts ###
-Splunk Enterprise, by default, Splunk Enterprise uses the var directory for indexes, search artifacts, etc. In the public image, the Splunk Enterprise 
-home directory is /opt/splunk, and the indexes are configured to run under var/. If you want to persist the indexed 
-data, then mount an external directory into the container under this folder.
+## Data Storage
 
-If you do not want to modify or persist any configuration changes made outside of what has been defined in the docker 
-image file, then use the following steps for your service.
+This section will cover examples of different options for configuring data persistence.
 
-#### Step 1: Create a named volume ####
+This includes both indexed data and configuration items.
+
+Splunk only supports data persistence to volumes mounted outside of the container.
+
+Data persistence for folders inside of the container is not supported. The following are intended as only as examples and unofficial guidelines.
+
+<br />
+
+### Storing indexes and search artifacts
+
+Splunk Enterprise, by default, Splunk Enterprise uses the var directory for indexes, search artifacts, etc.
+
+In the public image, the Splunk Enterprise home directory is /opt/splunk, and the indexes are configured to run under var/.
+
+If you want to persist the indexed data, then mount an external directory into the container under this folder.
+
+If you do not want to modify or persist any configuration changes made outside of what has been defined in the docker image file, then use the following steps for your service.
+
+<br />
+
+#### Step 1: Create a named volume
+
 To create a simple named volume in your Docker environment, run the following command
+
 ```
 docker volume create so1-var
 ```
+
 See Docker's official documentation for more complete instructions and additional options.
 
-#### Step 2: Define the docker compose YAML  and start the service####
+<br />
+
+#### Step 2: Define the docker compose YAML  and start the service
+
 Using the Docker Compose format, save the following contents into a docker-compose.yml file
 
 ```
@@ -51,43 +70,66 @@ services:
       - so1-var:/opt/splunk/var
 ```
 
-This mounts only the contents of /opt/splunk/var, so anything outside of this folder will not persist. Any configuration changes will not 
-remain when the container exits.  Note that changes will persist between starting and stopping a container. See 
-Docker's documentation for more discussion on the difference between starting, stopping, and exiting if the difference
-between them is unclear.
+This mounts only the contents of /opt/splunk/var, so anything outside of this folder will not persist. 
 
-In the same directory as docker-compose.yml run the following command
+Any configuration changes will not remain when the container exits.
+
+Note that changes will persist between starting and stopping a container.
+
+See Docker's documentation for more discussion on the difference between starting, stopping, and exiting if the difference between them is unclear.
+
+In the same directory as docker-compose.yml run the following command to start the service.
+
 ```
 docker-compose up
 ```
-to start the service.
 
-#### Viewing the contents of the volume ####
+<br />
+
+#### Viewing the contents of the volume
+
 To view the data outside of the container run
+
 ```
 docker volume inspect so1-var
 ```
+
 The output of that command should list where the data is stored.
 
-### Storing indexes, search artifacts, and configuration changes ###
-In this section, we build off of the previous example to save the configuration as well. This can make it easier to save modified 
-configurations, but simultaneously allows configuration drift to occur. If you want to keep configuration drift from 
-happening, but still want to be able to persist some of the data, you can save off the specific "local" folders that 
-you want the data to be persisted for (such as etc/system/local). However, be careful when doing this because you will 
-both know what folders you need to save off and the number of volumes can proliferate rapidly - depending on the 
-deployment. Please take the "Administrating Splunk" through Splunk Education prior to attempting this configuration.
+<br />
+
+### Storing indexes, search artifacts, and configuration changes
+
+In this section, we build off of the previous example to save the configuration as well.
+
+This can make it easier to save modified configurations, but simultaneously allows configuration drift to occur.
+
+If you want to keep configuration drift from happening, but still want to be able to persist some of the data, you can save off the specific "local" folders that you want the data to be persisted for (such as etc/system/local).
+
+However, be careful when doing this because you will both know what folders you need to save off and the number of volumes can proliferate rapidly - depending on the deployment.
+
+Please take the "Administrating Splunk" through Splunk Education prior to attempting this configuration.
 
 In these examples, we will assume that the entire etc folder is being mounted into the container.
 
-#### Step 1: Create a named volume ####
+<br />
+
+#### Step 1: Create a named volume again
+
 Again, create a simple named volume in your Docker environment, run the following command
+
 ```
 docker volume create so1-etc
 ```
+
 See Docker's official documentation for more complete instructions and additional options.
 
-#### Step 2: Define the docker compose YAML ####
+<br />
+
+#### Step 2: Define the docker compose YAML
+
 Notice that this differs from the previous example by adding in the so1-etc volume references.
+
 In the following example, save the following data into a file named docker-compose.yml
 
 ```
@@ -119,38 +161,56 @@ services:
       - 8089
     volumes:
       - so1-var:/opt/splunk/var
-	    - so1-etc:/opt/splunk/etc
+     - so1-etc:/opt/splunk/etc
 ```
 
-In the directory where the docker-compose.yml file is saved, run 
+In the directory where the docker-compose.yml file is saved, run below command to start the service.
+
 ```
 docker-compose up
 ```
-to start the service.
 
-When the volume is mounted the data will persist after the container exits. If a container has exited and restarted, 
-but no data shows up, then check the volume definition and verify that the container did not create a new volume 
-or that the volume mounted is in the same location. 
+When the volume is mounted the data will persist after the container exits.
 
-#### Viewing the contents of the volume ####
+If a container has exited and restarted, but no data shows up, then check the volume definition and verify that the container did not create a new volume or that the volume mounted is in the same location.
+
+<br />
+
+#### Viewing the contents of the volume again
+
 To view the etc directory outside of the container run one or both of the commands
+
 ```
 docker volume inspect so1-etc
 ```
+
 The output of that command should list the directory associated with the volume mount.
 
-#### Volume Mount Guidelines ####
-**Do not mount the same folder into two different Splunk Enterprise instances, this can cause inconsistencies in the 
-indexed data and undefined behavior within Splunk Enterprise itself.**
+<br />
 
-### Upgrading Splunk instances in your containers ###
+#### Volume Mount Guidelines
+
+**Do not mount the same folder into two different Splunk Enterprise instances, this can cause inconsistencies in the indexed data and undefined behavior within Splunk Enterprise itself.**
+
+<br />
+
+### Upgrading Splunk instances in your containers
+
 Upgrading Splunk instances requires volumes to be mounted for /opt/splunk/var and /opt/splunk/etc.
 
-#### Step 1: Persist your /opt/splunk/var and /opt/splunk/etc ####
+<br />
+
+#### Step 1: Persist your /opt/splunk/var and /opt/splunk/etc
+
 Follow the named volume creation tutorial above in order to have /opt/splunk/var and /opt/splunk/etc mounted for persisting data.
 
-#### Step 2: Update your yaml file with a new image and SPLUNK_UPGRADE=true ####
-In the same yaml file you initially used to deploy Splunk instances, update the specified image to the next version of Splunk image. Then, set **SPLUNK_UPGRADE=true** in the environment of all containers you wish to upgrade. Make sure to state relevant named volumes so persisted data can be mounted to a new container.
+<br />
+
+#### Step 2: Update your yaml file with a new image and SPLUNK_UPGRADE=true
+
+In the same yaml file you initially used to deploy Splunk instances, update the specified image to the next version of Splunk image.
+
+Then, set **SPLUNK_UPGRADE=true** in the environment of all containers you wish to upgrade. Make sure to state relevant named volumes so persisted data can be mounted to a new container.
 
 Below is an example yaml with SPLUNK_UPGRADE=true
 
@@ -184,13 +244,29 @@ services:
       - 8089
     volumes:
       - so1-var:/opt/splunk/var
-	    - so1-etc:/opt/splunk/etc
+     - so1-etc:/opt/splunk/etc
 ```
 
-#### Step 3: Deploy your containers using the updated yaml ####
-Similar to how you initially deployed your containers, run the command with the updated yaml that contains a reference to the new image and SPLUNK_UPGRADE=true in the environment. Make sure that you do NOT destory previously existing network and volumes. After running the command with the yaml file, your containers should be recreated with the new version of Splunk and persisted data properly mounted to /opt/splunk/var and /opt/splunk/etc.
+<br />
 
-#### Different types of volumes ####
-Using named volume is recommended so it is easier to attach and detach volumes to different Splunk instances while persisting your data. If you use anonymous volumes, Docker gives them random and unique names so you can still reuse anonymous volumes on different containers. If you use bind mounts, make sure that the mounts are setup properly to persist /opt/splunk/var and opt/splunk/etc. Starting new containers without proper mounts will result in a loss of your data.
+#### Step 3: Deploy your containers using the updated yaml
 
-Note [Docker Volume Documentation](https://docs.docker.com/storage/volumes/#create-and-manage-volumes) for more details about managing volumes. 
+Similar to how you initially deployed your containers, run the command with the updated yaml that contains a reference to the new image and SPLUNK_UPGRADE=true in the environment.
+
+Make sure that you do NOT destory previously existing network and volumes.
+
+After running the command with the yaml file, your containers should be recreated with the new version of Splunk and persisted data properly mounted to /opt/splunk/var and /opt/splunk/etc.
+
+<br />
+
+#### Different types of volumes
+
+Using named volume is recommended so it is easier to attach and detach volumes to different Splunk instances while persisting your data.
+
+If you use anonymous volumes, Docker gives them random and unique names so you can still reuse anonymous volumes on different containers.
+
+If you use bind mounts, make sure that the mounts are setup properly to persist /opt/splunk/var and opt/splunk/etc.
+
+Starting new containers without proper mounts will result in a loss of your data.
+
+Note [Docker Volume Documentation](https://docs.docker.com/storage/volumes/#create-and-manage-volumes) for more details about managing volumes.

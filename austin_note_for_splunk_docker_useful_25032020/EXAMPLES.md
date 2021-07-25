@@ -1,6 +1,8 @@
+# Splunk - Docker - Example
+
 ## Examples
 
-The purpose of this section is to showcase a wide variety of examples on how the `docker-splunk` project can be used. 
+The purpose of this section is to showcase a wide variety of examples on how the `docker-splunk` project can be used.
 
 Note that for more complex scenarios, we will opt to use a [Docker compose file](https://docs.docker.com/compose/compose-file/) instead of the CLI for the sake of readability.
 
@@ -26,9 +28,11 @@ Note that for more complex scenarios, we will opt to use a [Docker compose file]
 * [More](#more)
 
 ## Create standalone from CLI
+
 Execute the following to bring up your deployment:
+
 ```
-$ docker run --name so1 --hostname so1 -p 8000:8000 -e "SPLUNK_PASSWORD=<password>" -e "SPLUNK_START_ARGS=--accept-license" -it splunk/splunk:latest
+docker run --name so1 --hostname so1 -p 8000:8000 -e "SPLUNK_PASSWORD=<password>" -e "SPLUNK_START_ARGS=--accept-license" -it splunk/splunk:latest
 ```
 
 ## Create standalone from compose
@@ -48,11 +52,13 @@ services:
     ports:
       - 8000
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ SPLUNK_PASSWORD=<password> docker-compose up -d
+SPLUNK_PASSWORD=<password> docker-compose up -d
 ```
 
 ## Create standalone with license
@@ -74,6 +80,7 @@ services:
     ports:
       - 8000
 ```
+
 </details>
 
 <details><summary>docker-compose.yml - license from file</summary>
@@ -94,15 +101,18 @@ services:
     volumes:
       - ./splunk.lic:/tmp/license/splunk.lic
 ```
+
 </details>
 
 
 Execute the following to bring up your deployment:
+
 ```
-$ SPLUNK_PASSWORD=<password> docker-compose up -d
+SPLUNK_PASSWORD=<password> docker-compose up -d
 ```
 
 ## Create standalone with HEC
+
 To learn more about what the HTTP event collector (HEC) is and how to use it, please review the documentation [here](https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector).
 
 <details><summary>docker-compose.yml</summary>
@@ -121,20 +131,24 @@ services:
     ports:
       - 8000
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ SPLUNK_PASSWORD=<password> docker-compose up -d
+SPLUNK_PASSWORD=<password> docker-compose up -d
 ```
 
 To validate HEC is provisioned properly and functional:
+
 ```
 $ curl -k https://localhost:8088/services/collector/event -H "Authorization: Splunk abcd1234" -d '{"event": "hello world"}'
 {"text": "Success", "code": 0}
 ```
 
 ## Create standalone with app
+
 Splunk apps can also be installed using this Docker image.
 
 <details><summary>docker-compose.yml</summary>
@@ -153,14 +167,17 @@ services:
     ports:
       - 8000
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ SPLUNK_PASSWORD=<password> docker-compose up -d
+SPLUNK_PASSWORD=<password> docker-compose up -d
 ```
 
 ## Create standalone with SplunkBase app
+
 Apps showcased on SplunkBase can also be installed using this Docker image.
 
 <details><summary>docker-compose.yml</summary>
@@ -181,20 +198,29 @@ services:
     ports:
       - 8000
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ SPLUNKBASE_PASSWORD=<splunkbase_password> SPLUNK_PASSWORD=<password> docker-compose up -d
+SPLUNKBASE_PASSWORD=<splunkbase_password> SPLUNK_PASSWORD=<password> docker-compose up -d
 ```
 
 ## Create standalone with SSL enabled
-To enable SSL over SplunkWeb, you'll first need to generate your self-signed certificates. Please see the [Splunk docs](https://docs.splunk.com/Documentation/Splunk/latest/Security/Self-signcertificatesforSplunkWeb) on how to go about doing this. For the purposes of local development, you can use:
+
+To enable SSL over SplunkWeb, you'll first need to generate your self-signed certificates.
+
+Please see the [Splunk docs](https://docs.splunk.com/Documentation/Splunk/latest/Security/Self-signcertificatesforSplunkWeb) on how to go about doing this.
+
+For the purposes of local development, you can use:
+
 ```
 openssl req -x509 -newkey rsa:4096 -passout pass:abcd1234 -keyout /home/key.pem -out /home/cert.pem -days 365 -subj /CN=localhost
 ```
 
 Once you have your certificates available, you can execute the following to bring up your deployment with SSL enabled on the Splunk Web UI:
+
 ```
 $ docker run --name so1 --hostname so1 -p 8000:8000 \
               -e "SPLUNK_HTTP_ENABLESSL=true" \
@@ -208,15 +234,22 @@ $ docker run --name so1 --hostname so1 -p 8000:8000 \
 ```
 
 ## Create Standalone with Free license
-[Splunk Free](https://docs.splunk.com/Documentation/Splunk/latest/Admin/MoreaboutSplunkFree) is the totally free version of Splunk software. The Free license lets you index up to 500 MB per day and will never expire.
+
+[Splunk Free](https://docs.splunk.com/Documentation/Splunk/latest/Admin/MoreaboutSplunkFree) is the totally free version of Splunk software.
+
+The Free license lets you index up to 500 MB per day and will never expire.
 
 Execute the following to bring up a Splunk Free standalone environment:
+
 ```
-$ docker run --name so1 --hostname so1 -p 8000:8000 -e SPLUNK_PASSWORD=<password> -e SPLUNK_START_ARGS=--accept-license -e SPLUNK_LICENSE_URI=Free -it splunk/splunk:latest
+docker run --name so1 --hostname so1 -p 8000:8000 -e SPLUNK_PASSWORD=<password> -e SPLUNK_START_ARGS=--accept-license -e SPLUNK_LICENSE_URI=Free -it splunk/splunk:latest
 ```
 
 ## Create standalone and universal forwarder
-You can also enable distributed deployments. In this case, we can create a Splunk universal forwarder running in a container to stream logs to a Splunk standalone, also running in a container.
+
+You can also enable distributed deployments.
+
+In this case, we can create a Splunk universal forwarder running in a container to stream logs to a Splunk standalone, also running in a container.
 
 <details><summary>docker-compose.yml</summary>
 
@@ -261,14 +294,17 @@ services:
       - 8000
       - 8089
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ SPLUNK_PASSWORD=<password> docker-compose up -d
+SPLUNK_PASSWORD=<password> docker-compose up -d
 ```
 
 ## Create heavy forwarder
+
 The following will allow you spin up a forwarder, and stream its logs to an independent, external indexer located at `idx1-splunk.company.internal`, as long as that hostname is reachable on your network.
 
 <details><summary>docker-compose.yml</summary>
@@ -299,15 +335,20 @@ services:
     ports:
       - 1514
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ SPLUNK_PASSWORD=<password> docker-compose up -d
+SPLUNK_PASSWORD=<password> docker-compose up -d
 ```
 
 ## Create heavy forwarder and deployment server
-The following will allow you spin up a forwarder, and stream its logs to an independent, external indexer located at `idx1-splunk.company.internal`, as long as that hostname is reachable on your network. Additionally, it brings up a deployment server, which will download an app and distribute it to the heavy forwarder.
+
+The following will allow you spin up a forwarder, and stream its logs to an independent, external indexer located at `idx1-splunk.company.internal`, as long as that hostname is reachable on your network.
+
+Additionally, it brings up a deployment server, which will download an app and distribute it to the heavy forwarder.
 
 <details><summary>docker-compose.yml</summary>
 
@@ -352,20 +393,27 @@ services:
       - SPLUNK_APPS_URL=https://artifact.company.internal/splunk_app.tgz
       - SPLUNK_PASSWORD
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ SPLUNK_PASSWORD=<password> docker-compose up -d
+SPLUNK_PASSWORD=<password> docker-compose up -d
 ```
 
 ## Create indexer cluster
-To enable indexer cluster, we'll need to generate some common passwords and secret keys across all members of the deployment. To facilitate this, you can use the `splunk/splunk` image with the `create-defaults` command as so:
+
+To enable indexer cluster, we'll need to generate some common passwords and secret keys across all members of the deployment.
+
+To facilitate this, you can use the `splunk/splunk` image with the `create-defaults` command as so:
+
 ```
-$ docker run -it -e SPLUNK_PASSWORD=<password> splunk/splunk:latest create-defaults > default.yml
+docker run -it -e SPLUNK_PASSWORD=<password> splunk/splunk:latest create-defaults > default.yml
 ```
 
 Additionally, review the `docker-compose.yml` below to understand how linking Splunk instances together through roles and environment variables is accomplished:
+
 <details><summary>docker-compose.yml</summary>
 
 ```yaml
@@ -481,20 +529,27 @@ services:
     volumes:
       - ./default.yml:/tmp/defaults/default.yml
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ SPLUNK_PASSWORD=<password> docker-compose up -d
+SPLUNK_PASSWORD=<password> docker-compose up -d
 ```
 
 ## Create search head cluster
-To enable search head clustering, we'll need to generate some common passwords and secret keys across all members of the deployment. To facilitate this, you can use the `splunk/splunk` image with the `create-defaults` command as so:
+
+To enable search head clustering, we'll need to generate some common passwords and secret keys across all members of the deployment.
+
+To facilitate this, you can use the `splunk/splunk` image with the `create-defaults` command as so:
+
 ```
-$ docker run -it -e SPLUNK_PASSWORD=<password> splunk/splunk:latest create-defaults > default.yml
+docker run -it -e SPLUNK_PASSWORD=<password> splunk/splunk:latest create-defaults > default.yml
 ```
 
 Additionally, review the `docker-compose.yml` below to understand how linking Splunk instances together through roles and environment variables is accomplished:
+
 <details><summary>docker-compose.yml</summary>
 
 ```yaml
@@ -611,20 +666,27 @@ services:
     volumes:
       - ./default.yml:/tmp/defaults/default.yml
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ docker-compose up -d
+docker-compose up -d
 ```
 
 ## Create indexer cluster and search head cluster
-To enable both clustering modes, we'll need to generate some common passwords and secret keys across all members of the deployment. To facilitate this, you can use the `splunk/splunk` image with the `create-defaults` command as so:
+
+To enable both clustering modes, we'll need to generate some common passwords and secret keys across all members of the deployment.
+
+To facilitate this, you can use the `splunk/splunk` image with the `create-defaults` command as so:
+
 ```
-$ docker run -it -e SPLUNK_PASSWORD=<password> splunk/splunk:latest create-defaults > default.yml
+docker run -it -e SPLUNK_PASSWORD=<password> splunk/splunk:latest create-defaults > default.yml
 ```
 
 Additionally, review the `docker-compose.yml` below to understand how linking Splunk instances together through roles and environment variables is accomplished:
+
 <details><summary>docker-compose.yml</summary>
 
 ```yaml
@@ -812,14 +874,17 @@ services:
     volumes:
       - ./default.yml:/tmp/defaults/default.yml
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ docker-compose up -d
+docker-compose up -d
 ```
 
 ## Enable root endpoint on SplunkWeb
+
 <details><summary>docker-compose.yml</summary>
 
 ```yaml
@@ -836,16 +901,19 @@ services:
     ports:
       - 8000
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ SPLUNK_PASSWORD=<password> docker-compose up -d
+SPLUNK_PASSWORD=<password> docker-compose up -d
 ```
 
 Then, visit SplunkWeb on your browser with the root endpoint in the URL, such as `http://localhost:8000/splunkweb`.
 
 ## Create sidecar forwarder
+
 <details><summary>k8s-sidecar.yml</summary>
 
 ```yaml
@@ -878,14 +946,19 @@ spec:
   - name: shared-data
     emptyDir: {}
 ```
+
 </details>
 
 Execute the following to bring up your deployment:
+
 ```
-$ kubectl apply -f k8s-sidecar.yml
+kubectl apply -f k8s-sidecar.yml
 ```
 
-After your pod is ready, the universal forwarder will be reading the logs generated by your app via the shared volume mount. In the ideal case, your app is generating the logs while the forwarder is reading them and streaming the output to a separate Splunk instance located at splunk.company.internal.
+After your pod is ready, the universal forwarder will be reading the logs generated by your app via the shared volume mount.
+
+In the ideal case, your app is generating the logs while the forwarder is reading them and streaming the output to a separate Splunk instance located at splunk.company.internal.
 
 ## More
+
 There are a variety of Docker compose scenarios in the `docker-splunk` repo [here](https://github.com/splunk/docker-splunk/tree/develop/test_scenarios). Please feel free to use any of those for reference in terms of different topologies!
