@@ -12,56 +12,63 @@ Spin up splunk with docker-compose
 
 <br />
 
-- You can validate your docker-compose with "docker-compose config"
-  - ` docker-compose config -f full-stack-splunk-docker-compose.yml `
+## You can validate your docker-compose with "docker-compose config"
 
-- To start the full stack
-  - ` docker-compose -f full-stack-splunk-docker-compose.yml up -d `
+- ` docker-compose config -f full-stack-splunk-docker-compose.yml `
 
-- To check logs of container
-  - ` docker logs -f splunk7.3-indexer `
-  - ` docker logs -f splunk7.3-forwarder `
+<br />
 
-- After splunk docker run
-  - ` docker exec -u root splunk7.3-indexer bash -c 'cd /austin; ./init-splunk-indexer.sh' `
-  - ` docker exec -u root splunk7.3-indexer bash -c 'service ssh start' `
-  - ` docker exec -u root splunk7.3-forwarder bash -c 'cd /austin; ./init-splunk-forwarder.sh' `
-  - ` docker exec -u root splunk7.3-forwarder bash -c 'service ssh start' `
+## To start the full stack
 
+- ` docker-compose -f full-stack-splunk-docker-compose.yml up -d `
 
-- If you want to Destroy or stop or remove docker
-  - ` docker-compose -f full-stack-splunk-docker-compose.yml down -v --remove-orphans `
+<br />
 
+## To check logs of container
 
+- ` docker logs -f splunk7.3-indexer `
+- ` docker logs -f splunk7.3-forwarder `
 
+<br />
 
-# check which license group is active
+## After splunk docker run
+
+- ` docker exec -u root splunk7.3-indexer bash -c 'cd /austin; ./init-splunk-indexer.sh' `
+- ` docker exec -u root splunk7.3-indexer bash -c 'service ssh start' `
+- ` docker exec -u root splunk7.3-forwarder bash -c 'cd /austin; ./init-splunk-forwarder.sh' `
+- ` docker exec -u root splunk7.3-forwarder bash -c 'service ssh start' `
+
+<br />
+
+## If you want to Destroy or stop or remove docker
+
+- ` docker-compose -f full-stack-splunk-docker-compose.yml down -v --remove-orphans `
+
+<br />
+
+## Check which license group is active
+
+```bash
 sudo /opt/splunk/bin/splunk list licenser-groups -auth admin:P@ssw0rd
+```
 
-# switch to free license
+<br />
+
+## Switch to free license
+
+```
 sudo /opt/splunk/bin/splunk edit licenser-groups Free -is_active 1 -auth admin:P@ssw0rd
 
 sudo /opt/splunk/bin/splunk restart
+```
 
+<br />
 
+## You can use command below to extract default config from splunk
 
-sudo docker run --rm -dit -P -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=P@ssw0rd" --hostname splunk7.3 --name splunk7.3 store/splunk/splunk:7.3.0
-
-
-docker pull store/splunk/splunk:7.3.0
-
-
-sudo /opt/splunk/bin/splunk cmd btool props list | grep csv
-sudo /opt/splunk/bin/splunk cmd btool props list --debug | grep csv
-
-splunk btool check
-
-
-========================================================================================================
-
-You can use command below to extract default config from splunk
----  docker run --rm -it -P -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=P@ssw0rd" --hostname splunk7.3 --name splunk7.3 store/splunk/splunk:7.3.0 create-defaults > default.yml
-
+```
+docker run --rm -it -P -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=P@ssw0rd" --hostname splunk7.3 --name splunk7.3 store/splunk/splunk:7.3.0 create-defaults > default.yml
+```
 
 Make a init script -- init.sh
 #!/bin/bash
@@ -99,6 +106,19 @@ After splunk docker run
 Destroy or stop or remove docker
 --- docker rm -vf splunk7.3
 --- docker-compose down
+
+
+sudo /opt/splunk/bin/splunk cmd btool props list | grep csv
+sudo /opt/splunk/bin/splunk cmd btool props list --debug | grep csv
+
+splunk btool check
+
+
+
+sudo docker run --rm -dit -P -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=P@ssw0rd" --hostname splunk7.3 --name splunk7.3 store/splunk/splunk:7.3.0
+
+
+docker pull store/splunk/splunk:7.3.0
 
 
 sudo /opt/splunk/bin/splunk cmd btool props list | grep csv
