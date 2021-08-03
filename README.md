@@ -8,7 +8,7 @@ Updated 25072021
 
 # docker-compose-full-stacked-splunk7.3
 
-Note: This docker-compose, information built in the year 2020 and it's built for isolated lab environment, hence some command or information might not up-to-date, howver, you may take it as a reference
+Note: This docker-compose, information built in the year 2020 and it's built for isolated lab environment, hence some command or information might not up-to-date, however, you may take it as a reference
 
 Spin up splunk with docker-compose
 
